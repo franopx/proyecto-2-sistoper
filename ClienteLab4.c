@@ -56,7 +56,7 @@ int main(int argc, char const *argv[]){
     	   int valread = read(sockCliente, buffer, BUFFERSIZE);
 		   fputs(buffer, stdout);
 		}else{
- 			  printf("Mensaje: ");
+ 			  printf("%s dice: ", nombreClientes);
 			  fgets(buffer, BUFFERSIZE, stdin);
 
 			  if (strcmp(buffer, "BYE\n")==0){

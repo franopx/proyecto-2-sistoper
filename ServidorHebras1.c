@@ -13,6 +13,42 @@
 
 #define port 8000
 #define BUFFERSIZE 1024
+#define MAX_CLIENTS 3
+
+int connected_clients[MAX_CLIENTS] = {0};
+
+void addClient(int *sock)
+{
+    for(int i = 0; i < MAX_CLIENTS; i++)
+    {
+        if(connected_clients[i] == 0)
+        {
+            connected_clients[i] = *sock;
+            return;
+        }
+    }
+}
+
+void removeClient(int *sock)
+{
+    for(int i = 0; i < MAX_CLIENTS; i++)
+    {
+        if(connected_clients[i] == *sock)
+        {
+            connected_clients[i] = 0;
+            return;
+        }
+    }
+}
+
+void sendToAllClients(char *string)
+{
+    for(int i = 0; i < MAX_CLIENTS; i++)
+    {
+        if(connected_clients[i] == 0) {continue;}
+        send(connected_clients[i], *string, strlen(*string), 0);
+    }   
+}
 
 void crearSocket(int *sock){
     if ((*sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {        
@@ -70,6 +106,7 @@ void invertirPalabra(char *palabra){
 
 void *Servidor(void *arg){
    int *sockCliente = (int *)arg;
+   addClient(sockCliente);
    /////
    int primerMensaje = 1;
    while(1){
@@ -87,7 +124,7 @@ void *Servidor(void *arg){
             strcpy(nombre, buffer);
 
             printf("%s", buffer2);
-            send(*sockCliente, buffer2, strlen(buffer2), 0);
+            sendToAllClients(buffer2);
             primerMensaje = 0;
         }else{
             if (strcmp(buffer, "BYE\n")==0){
